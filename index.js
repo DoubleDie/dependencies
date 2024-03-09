@@ -1,6 +1,6 @@
 const { Client, Message } = require('discord.js-selfbot-v13')
 const fs = require('fs')
-let token = 'NDU4MTA5MzM5MTkwOTUxOTUx.GgE-cl.zh7eqnJqZudHyouhu-WQ2ZeCuVPQ9hq7WPPjLk';
+let token = 'NDU4MTA5MzM5MTkwOTUxOTUx.GwCAL0.W2LLo1s09InXYDu7A1k0KVE7omIJEq2tLe7kvg';
 const client = new Client({
 	checkUpdate: false
 });
