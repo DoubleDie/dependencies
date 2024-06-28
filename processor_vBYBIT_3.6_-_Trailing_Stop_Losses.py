@@ -41,21 +41,6 @@ rob_secret = 'Edlls60jK9yM7DgUmCwvy0lVPQ4YgOnDk43g'
 holger_api_key = 'VJMonsFJcJJ0k0kshQ'
 holger_secret = 'h6TbfrvvAMgOImJSjiBZqfmRpfsc9ONW6BbE'
 
-#load json file containing first take profits of previous session, these are used to create trailing stop losses
-f = open('rob_trailing_stops.json')
-rob_trailing_stops = json.load(f)
-f.close()
-f = open('holger_trailing_stops.json')
-holger_trailing_stops = json.load(f)
-f.close()
-
-#create list of symbols with open trades
-f = open('rob_open_coins.txt', 'r')
-rob_open_coins = f.read().split('\n')
-f.close()
-f = open('holger_open_coins.txt', 'r')
-holger_open_coins = f.read().split('\n')
-f.close()
 
 def init_setup(): #read value of last message on startup so that last message of previous session is not counted as a new message
 	datastream = open("last_message.txt", 'r', encoding='utf8') 
@@ -92,12 +77,6 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 					else:
 						print('Short trades yet to be implemented')
 					print('------------------------------------------------------------------')
-			if counter == 10:
-				for symbol in rob_open_coins:
-					tradeManager('rob', symbol, rob_trailing_stops[symbol], rob_api_key, rob_secret)
-				for symbol in holger_open_coins:
-					tradeManager('holger', symbol, holger_trailing_stops[symbol], holger_api_key, holger_secret)
-				counter = 0
 		except:
 			print(traceback.format_exc())
 			message = traceback.format_exc()
@@ -198,12 +177,12 @@ def connectAPI(account, params, api_key, secret_key):
 	coin = params['Coin']
 
 	if params['TP2'] != '':
-		take_profit = float(removeComma(params['TP2']))
-		trailing = float(removeComma(params['TP1']))
+		take_profit2 = float(removeComma(params['TP2']))
+		take_profit = float(removeComma(params['TP1']))
 
 	else:
+		take_profit2 = 'undefined'
 		take_profit = float(removeComma(params['TP1']))
-		trailing = 'fuck'
 
 	#get account balance
 	balance = bybitAPI.get_wallet_balance(accountType='UNIFIED', coin='USDT')
@@ -255,17 +234,24 @@ def connectAPI(account, params, api_key, secret_key):
 		print("||||||||||||||||||||||||||||||||||||||||||||")
 
 	#calculating qantity
-	inst_info = bybitAPI.get_instruments_info(category='linear', symbol=coin)
-	qtyStep = inst_info['result']['list'][0]['lotSizeFilter']['minOrderQty']
-	minQty = float(qtyStep) * float(buyprice)
-	qty = math.floor(ausd)
-	qty = qty/buyprice
-	qty = math.floor(qty)
-	if qty < minQty:
-		abandon = True
-	maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
-	if leverage > float(maxlever):
-		abandon = True
+	if not abandon:
+		inst_info = bybitAPI.get_instruments_info(category='linear', symbol=coin)
+		qtyStep = inst_info['result']['list'][0]['lotSizeFilter']['minOrderQty']
+		minQty = float(qtyStep) * float(buyprice)
+		qty = math.floor(ausd)
+		qty = qty/buyprice
+		qty = math.floor(qty)
+		if qty < minQty:
+			abandon = True
+		maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
+		if leverage > float(maxlever):
+			abandon = True
+		price = str(price)
+		if '.' in price:
+			dec = price.split('.')[1]
+			lpo = len(dec)
+		else:
+			lpo = 0
 
 
 	if not position_open and not abandon:
@@ -274,96 +260,72 @@ def connectAPI(account, params, api_key, secret_key):
 			bybitAPI.set_leverage(category='linear', symbol=coin, buyLeverage=str(leverage), sellLeverage=str(leverage))
 		except:
 			x = 1
-
+		print(lpo)
+		trailing = str(round(abs(float(buyprice) - float(take_profit)), lpo))
+		take_profit = str(round(float(take_profit), lpo))
+		stoploss = str(round(float(stoploss), lpo))
+		
 		#placing trade
-		placed_order = bybitAPI.place_order(
+		init_order = bybitAPI.place_order(
 			category='linear',
 			symbol=coin,
 			side='Buy',
 			orderType='Limit',
 			qty=str(qty),
-			price=str(buyprice),
-			takeProfit=str(take_profit),
-			stopLoss=str(stoploss),
-			tpslMode='Full',
-			tpOrderType='Market',
-			slOrderType='Market'
+			price=str(buyprice)
 			)
-		if account == 'rob':
-			rob_open_coins.append(coin)
-			rob_trailing_stops[coin] = str(trailing)
-		elif account == 'holger':
-			holger_opne_coins.append(coin)
-			holger_trailing_stops[coin] = str(trailing)
+		print(init_order)
+		new_position = 0
+		while new_position == 0:
+			time.sleep(0.5)
+			new_position = len(bybitAPI.get_positions(category='linear', symbol=coin)['result']['list'])
+			print(new_position)
+		time.sleep(2)
+		if take_profit2 != 'undefined':
+			first_stop_order = bybitAPI.set_trading_stop(
+				category='linear',
+				symbol=coin,
+				takeProfit=str(take_profit),
+				stopLoss=str(stoploss),
+				tpslMode='Partial',
+				tpOrderType='Market',
+				slOrderType='Market',
+				slSize=str(float(qty)/2),
+				tpSize=str(float(qty)/2),
+				positionIdx=0
+				)
+
+			second_stop_order = bybitAPI.set_trading_stop(
+				category='linear',
+				symbol=coin,
+				takeProfit=str(take_profit2),
+				stopLoss=str(stoploss),
+				tpslMode='Partial',
+				tpOrderType='Market',
+				slOrderType='Market',
+				slSize=str(float(qty)/2),
+				tpSize=str(float(qty)/2),
+				trailingStop=trailing,
+				activePrice=str(take_profit),
+				positionIdx=0
+				)
+		else:
+			stop_order = bybitAPI.set_trading_stop(
+				category='linear',
+				symbol=coin,
+				takeProfit=str(take_profit),
+				stopLoss=str(stoploss),
+				tpslMode='Partial',
+				tpOrderType='Market',
+				slOrderType='Market',
+				slSize=str(qty),
+				tpSize=str(qty),
+				trailingStop=trailing,
+				activePrice=(take_profit),
+				positionIdx=0
+				)
+
 		orderTable(coin, buyprice, ausd, leverage, stoploss, take_profit)
-
-def TradeManager(account, symbol, trailing, api_key, secret_key):
-	bybitAPI = HTTP(
-		testnet = False,
-		api_key = api_key,
-		api_secret = secret_key)
-	if account == 'rob':
-		order = bybitAPI.get_open_orders(category='linear', symbol=symbol)
-		if len(order['result']['list']) == 0:
-			rob_open_coins.remove(symbol)
-			f = open('rob_open_coins.txt', 'w')
-			for c in rob_open_coins:
-				f.write(c + '\n')
-			f.close()
-			rob_trailing_stops[symbol] = ''
-			f = open('rob_trailing_stops.json', 'w')
-			json.dump(rob_trailing_stops, f)
-			f.close()
-		else:
-			#actual trailing stop function
-			#check if sl is already trailing sl
-			if trailing != 'fuck':
-				sl_trigger = order['result']['list'][1]['triggerPrice']
-				orderID = order['result']['list'][1]['orderID']
-				if sl_trigger != trailing:
-					ticker = bybitAPI.get_tickers(category='linear', symbol=symbol)
-					price = float(ticker['result']['list'][0]['lastPrice'])
-					if price > float(trailing):
-						ammended = bybitAPI.amend_order(
-							category='linear',
-							symbol=symbol,
-							orderId=orderID,
-							stopLoss=trailing
-							)
-						print(ammended)
-
-	elif account == 'holger':
-		order = bybitAPI.get_open_orders(category='linear', symbol=symbol)
-		if len(order['result']['list']) == 0:
-			holger_open_coins.remove(symbol)
-			f = open('holger_open_coins.txt', 'w')
-			for c in holger_open_coins:
-				f.write(c + '\n')
-			f.close()
-			holger_trailing_stops[symbol] = ''
-			f = open('holger_trailing_stops.json', 'w')
-			json.dump(holger_trailing_stops, f)
-			f.close()
-		else:
-			#actual trailing stop function
-			#check if sl is already trailing sl
-			if trailing != 'fuck':
-				sl_trigger = order['result']['list'][1]['triggerPrice']
-				orderID = order['result']['list'][1]['orderID']
-				if sl_trigger != trailing:
-					ticker = bybitAPI.get_tickers(category='linear', symbol=symbol)
-					price = float(ticker['result']['list'][0]['lastPrice'])
-					if price > float(trailing):
-						ammended = bybitAPI.amend_order(
-							category='linear',
-							symbol=symbol,
-							orderId=orderID,
-							stopLoss=trailing
-							)
-						print(ammended)
-
-		#get order id
-		#amend order to place sl on trailing stop
 
 def removeComma(number):
 	number = number.split(',')
