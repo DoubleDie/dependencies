@@ -1,4 +1,5 @@
 const { Client, Message } = require('discord.js-selfbot-v13')
+require('dotenv').config()
 const fs = require('fs')
 let token = process.env.DISC_AUTH;
 const client = new Client({
