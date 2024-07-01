@@ -109,7 +109,7 @@ async function processSignal( details, apiKey, apiSecret ) {
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
         }
         if (orderQty > minOrderQty) {
-            let maxLever = parseInt(data.result.list[0].leverageFilter.maxLeverage)
+            let maxLever = parseInt(response.result.list[0].leverageFilter.maxLeverage)
             if (maxLever >= leverage) {
                 try {
                     response = await client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()});
