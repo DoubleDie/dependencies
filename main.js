@@ -63,16 +63,16 @@ function formatSignal( message ) {
 async function processSignal( details, apiKey, apiSecret ) {
     const client = new RestClientV5({testnet: false, key: apiKey, secret: apiSecret});
     let response = await client.getPositionInfo({category: "linear", settleCoin: "USDT"});
-    let data = await response.json();
+    console.log("Position info: ", response);
     let positions = data.result.list.length;
     if ( positions <= 1 ) {
         let response = await client.getWalletBalance({accountType: "UNIFIED", coin: "USDT"});
-        let data = await response.json();
+        console.log("Wallet info: ", response);
         let available = data.result.list[0].coin[0].availableToWithdraw;
         let inPositions = data.result.list[0].coin[0].totalPositionIM;
         let totalBalance = parseFloat(available) + parseFloat(inPositions);
         response = await client.getTickers({category: "linear", symbol: details.Coin});
-        data = await response.json();
+        console.log("Ticker info: ", response);
         let currentPrice = parseFloat(data.result.list[0].lastPrice);
         let priceDifference = Math.abs(currentPrice - details.buyPrice)
         if ( currentPrice > details.buyPrice ) {
@@ -97,7 +97,7 @@ async function processSignal( details, apiKey, apiSecret ) {
             leverage = Math.ceil(purchaseAmount/totalBalance)
         }
         response = await client.getInstrumentInfo({category: "linear", symbol: details.Coin});
-        data = await response.json();
+        console.log("Instument info: ", response);
         let minOrderQty = parseFloat(data.result.list[0].lotSizeFilter.minOrderQty);
         let orderQty = (purchaseAmount / details.buyPrice).toString();
         let decimal;
@@ -122,7 +122,6 @@ async function processSignal( details, apiKey, apiSecret ) {
                 while (newPosition === 0) {
                     setTimeout(() => {
                         client.getPositionInfo({category: "linear", symbol: details.Coin})
-                        .then(resp => resp.json())
                         .then(data => {
                             newPosition = data.result.list[0].length;
                         })
@@ -210,7 +209,7 @@ discordClient.on('messageCreate', async (message) => {
         console.log("Pass");
         let details = formatSignal(message);
         processSignal(details, robKey, robSecret);
-        processSignal(details, holgerKey, holgerSecret)
+        //processSignal(details, holgerKey, holgerSecret)
     }
 });
 discordClient.login(token);
