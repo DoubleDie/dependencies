@@ -64,16 +64,16 @@ async function processSignal( details, apiKey, apiSecret ) {
     const client = new RestClientV5({testnet: false, key: apiKey, secret: apiSecret});
     let response = await client.getPositionInfo({category: "linear", settleCoin: "USDT"});
     console.log("Position info: ", response);
-    let positions = data.result.list.length;
+    let positions = response.result.list.length;
     if ( positions <= 1 ) {
         let response = await client.getWalletBalance({accountType: "UNIFIED", coin: "USDT"});
         console.log("Wallet info: ", response);
-        let available = data.result.list[0].coin[0].availableToWithdraw;
-        let inPositions = data.result.list[0].coin[0].totalPositionIM;
+        let available = response.result.list[0].coin[0].availableToWithdraw;
+        let inPositions = response.result.list[0].coin[0].totalPositionIM;
         let totalBalance = parseFloat(available) + parseFloat(inPositions);
         response = await client.getTickers({category: "linear", symbol: details.Coin});
         console.log("Ticker info: ", response);
-        let currentPrice = parseFloat(data.result.list[0].lastPrice);
+        let currentPrice = parseFloat(response.result.list[0].lastPrice);
         let priceDifference = Math.abs(currentPrice - details.buyPrice)
         if ( currentPrice > details.buyPrice ) {
             details.stopLoss = details.stopLoss + priceDifference;
@@ -98,7 +98,7 @@ async function processSignal( details, apiKey, apiSecret ) {
         }
         response = await client.getInstrumentInfo({category: "linear", symbol: details.Coin});
         console.log("Instument info: ", response);
-        let minOrderQty = parseFloat(data.result.list[0].lotSizeFilter.minOrderQty);
+        let minOrderQty = parseFloat(response.result.list[0].lotSizeFilter.minOrderQty);
         let orderQty = (purchaseAmount / details.buyPrice).toString();
         let decimal;
         if (orderQty.includes(".")) {
