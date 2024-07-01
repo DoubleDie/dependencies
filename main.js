@@ -60,6 +60,22 @@ function formatSignal( message ) {
     return details;
 }
 
+async function setLeverage(client, details, leverage, maxLeverage) {
+    try {
+        console.log("Setting leverage...");
+        let resp = await client.setLeverage({
+            category: "linear",
+            symbol: details.Coin,
+            buyLeverage: leverage.toString(),
+            sellLeverage: leverage.toString()
+        });
+        console.log(resp)
+    } catch (error) {
+        console.log("Leverage already set")
+        console.log("Error: ", error)
+    }
+}
+
 async function processSignal( details, apiKey, apiSecret ) {
     const client = new RestClientV5({testnet: false, key: apiKey, secret: apiSecret});
     let response = await client.getPositionInfo({category: "linear", settleCoin: "USDT"});
@@ -117,11 +133,7 @@ async function processSignal( details, apiKey, apiSecret ) {
             console.log("Max Lever: ", maxLever)
             if (maxLever >= leverage) {
                 console.log("Setting leverage...")
-                client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()})
-                .then(resp => console.log(resp))
-                .catch((err) => {
-                    console.log("Lever already set.")
-                })
+                await setLeverage(client, details, leverage, maxLever)
                 }
                 let trailing = Math.abs(details.buyPrice - details.takeProfit1).toFixed(decimal);
                 client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
