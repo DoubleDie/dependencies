@@ -103,10 +103,10 @@ async function processSignal( details, apiKey, apiSecret ) {
         let decimal;
         if (orderQty.includes(".")) {
             decimal = orderQty.split(".")[1].length;
-            orderQty = parseFloat(orderQty.toFixed(decimal));
+            orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
         } else {
             decimal = 0;
-            orderQty = parseFloat(orderQty.toFixed(decimal));
+            orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
         }
         if (orderQty > minOrderQty) {
             let maxLever = parseInt(data.result.list[0].leverageFilter.maxLeverage)
