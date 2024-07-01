@@ -197,7 +197,7 @@ async function processSignal( details, apiKey, apiSecret ) {
 
 discordClient.on('messageCreate', async (message) => {
 	console.log('Message: ' + message.content)
-    let message = message.content;
+    message = message.content;
     let status = filterMessage(message);
     if (status) {
         console.log("Pass");
