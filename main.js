@@ -36,19 +36,25 @@ function filterMessage( message ) {
 
 function formatSignal( message ) {
     details = {Coin: "", buyPrice: "", stopLoss: "", takeProfit1: "", takeProfit2: ""};
-    if ( message.includes("Target 2") ) {
+    if ( message.includes("Target 3") ) {
         message = message.split("\n").join(" ").split(" ");
-        console.log(message[30])
         details.Coin = message[1] + "USDT";
         details.buyPrice = parseFloat(message[5].slice(1).split(",").join(""));
-        details.stopLoss = parseFloat(message[-3].split(",").join(""));
+        details.stopLoss = parseFloat(message[30].split(",").join(""));
+        details.takeProfit1 = parseFloat(message[14].split(",").join(""));
+        details.takeProfit2 = parseFloat(message[19].split(",").join(""));
+    } else if ("Target 2") {
+        message = message.split("\n").join(" ").split(" ");
+        details.Coin = message[1] + "USDT";
+        details.buyPrice = parseFloat(message[5].slice(1).split(",").join(""));
+        details.stopLoss = parseFloat(message[25].split(",").join(""));
         details.takeProfit1 = parseFloat(message[14].split(",").join(""));
         details.takeProfit2 = parseFloat(message[19].split(",").join(""));
     } else {
         message = message.split("\n").join(" ").split(" ");
         details.Coin = message[1] + "USDT";
         details.buyPrice = parseFloat(message[5].slice(1).split(",").join(""));
-        details.stopLoss = parseFloat(message[-3].split(",").join(""));
+        details.stopLoss = parseFloat(message[20].split(",").join(""));
         details.takeProfit1 = parseFloat(message[14].split(",").join(""));
     }
     return details;
