@@ -102,8 +102,8 @@ async function processSignal( details, apiKey, apiSecret ) {
         console.log("Min Order Qty: ", minOrderQty)
         let orderQty = (purchaseAmount / details.buyPrice).toString();
         let decimal;
-        if (orderQty.includes(".")) {
-            decimal = orderQty.split(".")[1].length;
+        if (minOrderQty.includes(".")) {
+            decimal = minOrderQty.split(".")[1].length;
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
             console.log("Order Qty: ", orderQty)
         } else {
@@ -115,10 +115,10 @@ async function processSignal( details, apiKey, apiSecret ) {
             let maxLever = parseInt(response.result.list[0].leverageFilter.maxLeverage)
             console.log("Max Lever: ", maxLever)
             if (maxLever >= leverage) {
-                try {
-                    response = await client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()});
-                } catch (err) {
+                response = await client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()})
+                .catch((err) => {
                     console.log("Lever already set.")
+                })
                 }
                 let trailing = Math.abs(details.buyPrice - details.takeProfit1).toFixed(decimal);
                 client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
