@@ -96,7 +96,7 @@ async function processSignal( details, apiKey, apiSecret ) {
         } else if ( positions === 1 ) {
             leverage = Math.ceil(purchaseAmount/totalBalance)
         }
-        response = await client.getInstrumentInfo({category: "linear", symbol: details.Coin});
+        response = await client.getInstrumentsInfo({category: "linear", symbol: details.Coin});
         console.log("Instument info: ", response);
         let minOrderQty = parseFloat(response.result.list[0].lotSizeFilter.minOrderQty);
         let orderQty = (purchaseAmount / details.buyPrice).toString();
