@@ -38,7 +38,7 @@ function formatSignal( message ) {
     details = {Coin: "", buyPrice: "", stopLoss: "", takeProfit1: "", takeProfit2: ""};
     if ( message.includes("Target 2") ) {
         message = message.split("\n").join(" ").split(" ");
-        console.log(message[-3])
+        console.log(message[30])
         details.Coin = message[1] + "USDT";
         details.buyPrice = parseFloat(message[5].slice(1).split(",").join(""));
         details.stopLoss = parseFloat(message[-3].split(",").join(""));
