@@ -99,17 +99,21 @@ async function processSignal( details, apiKey, apiSecret ) {
         response = await client.getInstrumentsInfo({category: "linear", symbol: details.Coin});
         console.log("Instument info: ", response);
         let minOrderQty = parseFloat(response.result.list[0].lotSizeFilter.minOrderQty);
+        console.log("Min Order Qty: ", minOrderQty)
         let orderQty = (purchaseAmount / details.buyPrice).toString();
         let decimal;
         if (orderQty.includes(".")) {
             decimal = orderQty.split(".")[1].length;
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
+            console.log("Order Qty: ", orderQty)
         } else {
             decimal = 0;
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
+            console.log("Order Qty: ", orderQty)
         }
         if (orderQty > minOrderQty) {
             let maxLever = parseInt(response.result.list[0].leverageFilter.maxLeverage)
+            console.log("Max Lever: ", maxLever)
             if (maxLever >= leverage) {
                 try {
                     response = await client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()});
