@@ -204,13 +204,8 @@ async function processSignal( details, apiKey, apiSecret ) {
                 }, 10000)
             }
         }
-        
-
-
-
-    }
-
 }
+
 
 discordClient.on('messageCreate', async (message) => {
 	console.log('Message: ' + message.content)
