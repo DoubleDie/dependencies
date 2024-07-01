@@ -117,13 +117,20 @@ async function processSignal( details, apiKey, apiSecret ) {
                     console.log("Lever already set.")
                 }
                 let trailing = Math.abs(details.buyPrice - details.takeProfit1).toFixed(decimal);
-                let initOrder = client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()});
+                client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((err) => {
+                    console.log("Error: ", err)
+                })
                 let newPosition = 0
                 while (newPosition === 0) {
                     setTimeout(() => {
                         client.getPositionInfo({category: "linear", symbol: details.Coin})
                         .then(data => {
                             newPosition = data.result.list[0].length;
+                            console.log("Positions open: ", newPosition)
                         })
                     }, 500)
                 }
