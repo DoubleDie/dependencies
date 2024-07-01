@@ -116,7 +116,8 @@ async function processSignal( details, apiKey, apiSecret ) {
             let maxLever = parseInt(response.result.list[0].leverageFilter.maxLeverage)
             console.log("Max Lever: ", maxLever)
             if (maxLever >= leverage) {
-                response = await client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()})
+                client.setLeverage({category: "linear", symbol: details.Coin, buyLeverage: leverage.toString(), sellLeverage: leverage.toString()})
+                .then(resp => console.log(resp))
                 .catch((err) => {
                     console.log("Lever already set.")
                 })
