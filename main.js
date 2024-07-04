@@ -7,7 +7,7 @@ const discordClient = new Client({
 });
 
 discordClient.on('ready', async () => {
-	console.log('Client is ready!')
+	console.log('Client is ready...')
 });
 
 const commonTerms = ["Target 1:", "POWER", "SL Close Below", "<@&1180193532309409874>"];
@@ -69,7 +69,6 @@ async function setLeverage(client, details, leverage, maxLeverage) {
             buyLeverage: leverage.toString(),
             sellLeverage: leverage.toString()
         });
-        console.log(resp)
     } catch (error) {
         console.log("Leverage already set")
         console.log("Error: ", error)
@@ -79,16 +78,13 @@ async function setLeverage(client, details, leverage, maxLeverage) {
 async function processSignal( details, apiKey, apiSecret ) {
     const client = new RestClientV5({testnet: false, key: apiKey, secret: apiSecret});
     let response = await client.getPositionInfo({category: "linear", settleCoin: "USDT"});
-    console.log("Position info: ", response);
     let positions = response.result.list.length;
     if ( positions <= 1 ) {
         let response = await client.getWalletBalance({accountType: "UNIFIED", coin: "USDT"});
-        console.log("Wallet info: ", response);
         let available = response.result.list[0].coin[0].availableToWithdraw;
         let inPositions = response.result.list[0].coin[0].totalPositionIM;
         let totalBalance = parseFloat(available) + parseFloat(inPositions);
         response = await client.getTickers({category: "linear", symbol: details.Coin});
-        console.log("Ticker info: ", response);
         let currentPrice = parseFloat(response.result.list[0].lastPrice);
         let priceDifference = Math.abs(currentPrice - details.buyPrice)
         if ( currentPrice > details.buyPrice ) {
@@ -113,106 +109,84 @@ async function processSignal( details, apiKey, apiSecret ) {
             leverage = Math.ceil(purchaseAmount/totalBalance)
         }
         response = await client.getInstrumentsInfo({category: "linear", symbol: details.Coin});
-        console.log("Instument info: ", response);
         let minOrderQty = response.result.list[0].lotSizeFilter.minOrderQty;
-        console.log("Min Order Qty: ", minOrderQty)
         let orderQty = (purchaseAmount / details.buyPrice).toString();
         let decimal;
         if (minOrderQty.includes(".")) {
             decimal = minOrderQty.split(".")[1].length;
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
-            console.log("Order Qty: ", orderQty)
         } else {
             decimal = 0;
             orderQty = parseFloat(parseFloat(orderQty).toFixed(decimal));
-            console.log("Order Qty: ", orderQty)
         }
         minOrderQty = parseFloat(minOrderQty);
         if (orderQty > minOrderQty) {
             let maxLever = parseInt(response.result.list[0].leverageFilter.maxLeverage)
-            console.log("Max Lever: ", maxLever)
             if (maxLever >= leverage) {
-                console.log("Setting leverage...")
                 await setLeverage(client, details, leverage, maxLever)
                 }
                 let trailing = Math.abs(details.buyPrice - details.takeProfit1).toFixed(decimal);
+                let orderDetails = [];
                 response = await client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
                 data = await response;
-                console.log(data)
-                let newPosition = 0
-                while (newPosition === 0) {
-                    setTimeout(() => {
-                        client.getPositionInfo({category: "linear", symbol: details.Coin})
-                        .then(data => {
-                            newPosition = data.result.list[0].length;
-                            console.log("Positions open: ", newPosition)
-                        })
-                    }, 500)
+                orderDetails.push(data)
+                let newPosition = '0'
+                while (newPosition === '0') {
+                    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
+                    data = await response.result.list; 
+                    newPosition = data[0].avgPrice;
                 }
-                setTimeout(() => {
-                    if (details.takeProfit2 !== "") {
-                        client.setTradingStop({
-                            category: "linear",
-                            symbol: details.Coin,
-                            takeProfit: details.takeProfit.toString(),
-                            stopLoss: details.stopLoss.toString(),
-                            tpslMode: "Partial",
-                            tpOrderType: "Market",
-                            slOrderType: "Market",
-                            slSize: (orderQty/2).toString(),
-                            tpSize: (orderQty/2).toString(),
-                            positionIdx: 0
-                        })
-                        .then((response) => {
-                            console.log(response);
-                        })
-                        .catch((err) => {
-                            console.log("Error: ", err)
-                        })
-                        client.setTradingStop({
-                            category: "linear",
-                            symbol: details.Coin,
-                            takeProfit: details.takeProfit2.toString(),
-                            stopLoss: details.stopLoss.toString(),
-                            tpslMode: "Partial",
-                            tpOrderType: "Market",
-                            slOrderType: "Market",
-                            slSize: (orderQty/2).toString(),
-                            tpSize: (orderQty/2).toString(),
-                            trailingStop: trailing,
-                            activePrice: details.takeProfit1.toString(),
-                            positionIdx: 0
-                        })
-                        .then((response) => {
-                            console.log(response);
-                        })
-                        .catch((err) => {
-                            console.log("Error: ", err)
-                        })
-                    } else {
-                        client.setTradingStop({
-                            category: "linear",
-                            symbol: details.Coin,
-                            takeProfit: details.takeProfit1.toString(),
-                            stopLoss: details.stopLoss.toString(),
-                            tpslMode: "Partial",
-                            tpOrderType: "Market",
-                            slOrderType: "Market",
-                            slSize: (orderQty).toString(),
-                            tpSize: (orderQty).toString(),
-                            trailingStop: trailing,
-                            activePrice: details.takeProfit1.toString(),
-                            positionIdx: 0
-                        })
-                        .then((response) => {
-                            console.log(response);
-                        })
-                        .catch((err) => {
-                            console.log("Error: ", err)
-                        })
-                    }
-
-                }, 10000)
+                if (details.takeProfit2 !== "") {
+                    response = await client.setTradingStop({
+                        category: "linear",
+                        symbol: details.Coin,
+                        takeProfit: details.takeProfit1.toString(),
+                        stopLoss: details.stopLoss.toString(),
+                        tpslMode: "Partial",
+                        tpOrderType: "Market",
+                        slOrderType: "Market",
+                        slSize: (orderQty/2).toString(),
+                        tpSize: (orderQty/2).toString(),
+                        positionIdx: 0
+                    })
+                    data = await response;
+                    orderDetails.push(data)
+                    response = await client.setTradingStop({
+                        category: "linear",
+                        symbol: details.Coin,
+                        takeProfit: details.takeProfit2.toString(),
+                        stopLoss: details.stopLoss.toString(),
+                        tpslMode: "Partial",
+                        tpOrderType: "Market",
+                        slOrderType: "Market",
+                        slSize: (orderQty/2).toString(),
+                        tpSize: (orderQty/2).toString(),
+                        trailingStop: trailing,
+                        activePrice: details.takeProfit1.toString(),
+                        positionIdx: 0
+                    })
+                    data = await response;
+                    orderDetails.push(data)
+                } else {
+                    response = await client.setTradingStop({
+                        category: "linear",
+                        symbol: details.Coin,
+                        takeProfit: details.takeProfit1.toString(),
+                        stopLoss: details.stopLoss.toString(),
+                        tpslMode: "Partial",
+                        tpOrderType: "Market",
+                        slOrderType: "Market",
+                        slSize: (orderQty).toString(),
+                        tpSize: (orderQty).toString(),
+                        trailingStop: trailing,
+                        activePrice: details.takeProfit1.toString(),
+                        positionIdx: 0
+                    })
+                    data = await response;
+                    orderDetails.push(data)
+                }
+                console.log("Order details: ", orderDetails)
+                console.log("--------------------------------------------")
             }
         }
 }
@@ -226,7 +200,7 @@ discordClient.on('messageCreate', async (message) => {
         console.log("Pass");
         let details = formatSignal(message);
         processSignal(details, robKey, robSecret);
-        //processSignal(details, holgerKey, holgerSecret)
+        processSignal(details, holgerKey, holgerSecret)
     }
 });
 discordClient.login(token);

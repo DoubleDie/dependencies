@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bybit-api": "^3.10.11",
     "discord.js-selfbot-v13": "^2.15.0",
     "dotenv": "^16.4.5"
   }
