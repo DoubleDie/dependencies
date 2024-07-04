@@ -141,7 +141,7 @@ async function processSignal( details, apiKey, apiSecret ) {
                     newPosition = data[0].avgPrice;
                     timer += 1
                 }
-                
+                console.log("too fast")
                 if (timer >= 60) {
                     response = await client.cancelOrder({
                         category: "linear",
