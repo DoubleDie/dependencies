@@ -135,6 +135,7 @@ async function processSignal( details, apiKey, apiSecret ) {
                     response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
                     data = await response.result.list; 
                     newPosition = data[0].avgPrice;
+
                 }
                 if (details.takeProfit2 !== "") {
                     response = await client.setTradingStop({
