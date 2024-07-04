@@ -140,6 +140,8 @@ async function processSignal( details, apiKey, apiSecret ) {
                     data = await response.result.list; 
                     newPosition = data[0].avgPrice;
                     timer += 1
+                    console.log(timer)
+                    console.log(newPosition)
                 }
                 if (timer >= 60) {
                     response = await client.cancelOrder({
@@ -214,7 +216,7 @@ discordClient.on('messageCreate', async (message) => {
         console.log("Pass");
         let details = formatSignal(message);
         processSignal(details, robKey, robSecret);
-        processSignal(details, holgerKey, holgerSecret)
+        //processSignal(details, holgerKey, holgerSecret)
     }
 });
 discordClient.login(token);
