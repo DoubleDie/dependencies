@@ -140,8 +140,8 @@ async function processSignal( details, apiKey, apiSecret ) {
                     data = await response.result.list; 
                     newPosition = data[0].avgPrice;
                     timer += 1
-                    console.log(timer)
-                    console.log(newPosition)
+                    //console.log(timer)
+                    //console.log(newPosition)
                 }
                 if (timer >= 60) {
                     response = await client.cancelOrder({
