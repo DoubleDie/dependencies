@@ -130,66 +130,77 @@ async function processSignal( details, apiKey, apiSecret ) {
                 let orderDetails = [];
                 response = await client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
                 data = await response;
+                let orderId = await data.result.orderId;
                 orderDetails.push(data)
                 let newPosition = '0'
-                while (newPosition === '0') {
+                let timer = 0
+                while (newPosition === '0' && timer <= 60) {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
                     data = await response.result.list; 
                     newPosition = data[0].avgPrice;
-                    console.log(newPosition);
+                    timer += 1
                 }
-                if (details.takeProfit2 !== "") {
-                    response = await client.setTradingStop({
+                
+                if (timer >= 60) {
+                    response = await client.cancelOrder({
                         category: "linear",
                         symbol: details.Coin,
-                        takeProfit: details.takeProfit1.toString(),
-                        stopLoss: details.stopLoss.toString(),
-                        tpslMode: "Partial",
-                        tpOrderType: "Market",
-                        slOrderType: "Market",
-                        slSize: (orderQty/2).toString(),
-                        tpSize: (orderQty/2).toString(),
-                        positionIdx: 0
+                        orderId: orderId
                     })
-                    data = await response;
-                    orderDetails.push(data)
-                    response = await client.setTradingStop({
-                        category: "linear",
-                        symbol: details.Coin,
-                        takeProfit: details.takeProfit2.toString(),
-                        stopLoss: details.stopLoss.toString(),
-                        tpslMode: "Partial",
-                        tpOrderType: "Market",
-                        slOrderType: "Market",
-                        slSize: (orderQty/2).toString(),
-                        tpSize: (orderQty/2).toString(),
-                        trailingStop: trailing,
-                        activePrice: details.takeProfit1.toString(),
-                        positionIdx: 0
-                    })
-                    data = await response;
-                    orderDetails.push(data)
                 } else {
-                    response = await client.setTradingStop({
-                        category: "linear",
-                        symbol: details.Coin,
-                        takeProfit: details.takeProfit1.toString(),
-                        stopLoss: details.stopLoss.toString(),
-                        tpslMode: "Partial",
-                        tpOrderType: "Market",
-                        slOrderType: "Market",
-                        slSize: (orderQty).toString(),
-                        tpSize: (orderQty).toString(),
-                        trailingStop: trailing,
-                        activePrice: details.takeProfit1.toString(),
-                        positionIdx: 0
-                    })
-                    data = await response;
-                    orderDetails.push(data)
+                    if (details.takeProfit2 !== "") {
+                        response = await client.setTradingStop({
+                            category: "linear",
+                            symbol: details.Coin,
+                            takeProfit: details.takeProfit1.toString(),
+                            stopLoss: details.stopLoss.toString(),
+                            tpslMode: "Partial",
+                            tpOrderType: "Market",
+                            slOrderType: "Market",
+                            slSize: (orderQty/2).toString(),
+                            tpSize: (orderQty/2).toString(),
+                            positionIdx: 0
+                        })
+                        data = await response;
+                        orderDetails.push(data)
+                        response = await client.setTradingStop({
+                            category: "linear",
+                            symbol: details.Coin,
+                            takeProfit: details.takeProfit2.toString(),
+                            stopLoss: details.stopLoss.toString(),
+                            tpslMode: "Partial",
+                            tpOrderType: "Market",
+                            slOrderType: "Market",
+                            slSize: (orderQty/2).toString(),
+                            tpSize: (orderQty/2).toString(),
+                            trailingStop: trailing,
+                            activePrice: details.takeProfit1.toString(),
+                            positionIdx: 0
+                        })
+                        data = await response;
+                        orderDetails.push(data)
+                    } else {
+                        response = await client.setTradingStop({
+                            category: "linear",
+                            symbol: details.Coin,
+                            takeProfit: details.takeProfit1.toString(),
+                            stopLoss: details.stopLoss.toString(),
+                            tpslMode: "Partial",
+                            tpOrderType: "Market",
+                            slOrderType: "Market",
+                            slSize: (orderQty).toString(),
+                            tpSize: (orderQty).toString(),
+                            trailingStop: trailing,
+                            activePrice: details.takeProfit1.toString(),
+                            positionIdx: 0
+                        })
+                        data = await response;
+                        orderDetails.push(data)
+                    }
+                    console.log("Order details: ", orderDetails)
+                    console.log("--------------------------------------------")
                 }
-                console.log("Order details: ", orderDetails)
-                console.log("--------------------------------------------")
             }
         }
 }
