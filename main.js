@@ -141,13 +141,10 @@ async function processSignal( details, apiKey, apiSecret ) {
                 console.log(data)
                 let newPosition = 0
                 while (newPosition === 0) {
-                    setTimeout(() => {
-                        client.getPositionInfo({category: "linear", symbol: details.Coin})
-                        .then(data => {
-                            newPosition = data.result.list[0].length;
-                            console.log("Positions open: ", newPosition)
-                        })
-                    }, 500)
+                    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
+                    data = await response; 
+                    newPosition = data.result.list[0].length;
+                    console.log("Positions open: ", newPosition)
                 }
                 setTimeout(() => {
                     if (details.takeProfit2 !== "") {
