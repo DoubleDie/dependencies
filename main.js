@@ -62,7 +62,6 @@ function formatSignal( message ) {
 
 async function setLeverage(client, details, leverage, maxLeverage) {
     try {
-        console.log("Setting leverage...");
         let resp = await client.setLeverage({
             category: "linear",
             symbol: details.Coin,
@@ -73,6 +72,13 @@ async function setLeverage(client, details, leverage, maxLeverage) {
         console.log("Leverage already set")
         console.log("Error: ", error)
     }
+}
+
+async function positionInfo(details) {
+    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
+    data = await response.result.list; 
+    newPosition = data[0].avgPrice;
+    return await newPosition;
 }
 
 async function processSignal( details, apiKey, apiSecret ) {
@@ -132,9 +138,10 @@ async function processSignal( details, apiKey, apiSecret ) {
                 orderDetails.push(data)
                 let newPosition = '0'
                 while (newPosition === '0') {
-                    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
-                    data = await response.result.list; 
-                    newPosition = data[0].avgPrice;
+                    setTimeout(() => {
+                    positionInfo(details).then(data => newPosition = data)
+                    console.log(newPosition)
+                    }, 500)
 
                 }
                 if (details.takeProfit2 !== "") {
