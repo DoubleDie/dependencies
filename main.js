@@ -142,7 +142,7 @@ async function processSignal( details, apiKey, apiSecret ) {
                 let newPosition = 0
                 while (newPosition === 0) {
                     response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
-                    data = await response; 
+                    data = await JSON.parse(response); 
                     newPosition = data.result.list[0].length;
                     console.log("Positions open: ", newPosition)
                 }
