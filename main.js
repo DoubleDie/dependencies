@@ -136,13 +136,9 @@ async function processSignal( details, apiKey, apiSecret ) {
                 await setLeverage(client, details, leverage, maxLever)
                 }
                 let trailing = Math.abs(details.buyPrice - details.takeProfit1).toFixed(decimal);
-                client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
-                .then((response) => {
-                    console.log(response);
-                })
-                .catch((err) => {
-                    console.log("Error: ", err)
-                })
+                response = await client.submitOrder({category: "linear", symbol: details.Coin, side: "Buy", orderType: "Limit", qty: orderQty.toString(), price: details.buyPrice.toString()})
+                data = await response;
+                console.log(data)
                 let newPosition = 0
                 while (newPosition === 0) {
                     setTimeout(() => {
