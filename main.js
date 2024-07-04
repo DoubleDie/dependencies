@@ -74,12 +74,7 @@ async function setLeverage(client, details, leverage, maxLeverage) {
     }
 }
 
-async function positionInfo(details) {
-    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
-    data = await response.result.list; 
-    newPosition = data[0].avgPrice;
-    return await newPosition;
-}
+
 
 async function processSignal( details, apiKey, apiSecret ) {
     const client = new RestClientV5({testnet: false, key: apiKey, secret: apiSecret});
@@ -138,11 +133,11 @@ async function processSignal( details, apiKey, apiSecret ) {
                 orderDetails.push(data)
                 let newPosition = '0'
                 while (newPosition === '0') {
-                    setTimeout(() => {
-                    positionInfo(details).then(data => newPosition = data)
-                    console.log(newPosition)
-                    }, 500)
-
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    response = await client.getPositionInfo({category: "linear", symbol: details.Coin})
+                    data = await response.result.list; 
+                    newPosition = data[0].avgPrice;
+                    console.log(newPosition);
                 }
                 if (details.takeProfit2 !== "") {
                     response = await client.setTradingStop({
