@@ -148,6 +148,7 @@ async function processSignal( details, apiKey, apiSecret ) {
                         symbol: details.Coin,
                         orderId: orderId
                     })
+                    console.log("Trade Aborted: Position not filled in time.")
                 } else {
                     if (details.takeProfit2 !== "") {
                         response = await client.setTradingStop({
