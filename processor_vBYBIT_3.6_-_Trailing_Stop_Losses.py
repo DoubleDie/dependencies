@@ -145,7 +145,7 @@ def connectAPI(account, params, api_key, secret_key):
 		api_secret = secret_key)
 
 	abandon = False
-
+	print("initiating")
 	#check for positions
 	positions = len(bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list'])
 	 
@@ -178,6 +178,7 @@ def connectAPI(account, params, api_key, secret_key):
 
 		#calculate risk
 		fiatQuantity = ((0.10 * float(totalBalance))/(abs(float(params["stopLoss"])) - float(params["buyPrice"])))*float(params["buyPrice"])
+		print("purchase amount")
 
 		#calculating required leverage
 		if positions == 0:
