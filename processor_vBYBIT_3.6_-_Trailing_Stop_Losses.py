@@ -181,9 +181,9 @@ def connectAPI(account, params, api_key, secret_key):
 
 		#calculating required leverage
 		if positions == 0:
-			leverage = math.ceil((fiatQuantity)/(available/2))
+			leverage = math.ceil((fiatQuantity)/(float(available)/2))
 		if positions == 1:
-			leverage = math.ceil((fiatQuantity)/available)
+			leverage = math.ceil((fiatQuantity)/float(available))
 
 		#calculating qantity
 		inst_info = bybitAPI.get_instruments_info(category='linear', symbol=params["Coin"])
