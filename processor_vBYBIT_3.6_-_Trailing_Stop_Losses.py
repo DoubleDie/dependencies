@@ -61,7 +61,7 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 			datastream.close()
 			if chatlog != content:
 				content = chatlog
-				data_dict = chatlog
+				data_dict = json.loads(chatlog)
 				print(data_dict)
 				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
 					connectAPI('rob', data_dict, rob_api_key, rob_secret)
