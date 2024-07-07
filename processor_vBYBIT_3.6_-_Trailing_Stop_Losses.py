@@ -196,9 +196,11 @@ def connectAPI(account, params, api_key, secret_key):
 		else:
 			math.floor(orderQty)
 		if orderQty >= float(minOrderQty):	
+			print("min quant good")
 			#checking maximum leverage is above used leverage
 			maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
 			if leverage < float(maxlever):
+				print("lever good")
 				#rounding all price figures to the instruments native figures
 				if '.' in params["buyPrice"]:
 					roundTo = len(params["buyPrice"].split('.')[1])
