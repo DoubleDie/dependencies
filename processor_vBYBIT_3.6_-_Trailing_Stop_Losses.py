@@ -195,6 +195,8 @@ def connectAPI(account, params, api_key, secret_key):
 			orderQty = round(orderQty, roundTo)
 		else:
 			math.floor(orderQty)
+		print(f"min: {minOrderQty}")
+		print(f"actual: {orderQty}")
 		if orderQty >= float(minOrderQty):	
 			print("min quant good")
 			#checking maximum leverage is above used leverage
