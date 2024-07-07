@@ -178,7 +178,7 @@ def connectAPI(account, params, api_key, secret_key):
 
 		#calculate risk
 		fiatQuantity = ((0.10 * float(totalBalance))/(abs(float(params["stopLoss"])) - float(params["buyPrice"])))*float(params["buyPrice"])
-		print("purchase amount")
+		print(f"purchase amount: {fiatQuantity}")
 
 		#calculating required leverage
 		if positions == 0:
