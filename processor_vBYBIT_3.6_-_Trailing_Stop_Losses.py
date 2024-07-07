@@ -64,8 +64,8 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 				data_dict = json.loads(chatlog)
 				print(data_dict)
 				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
-					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.1)
-					#connectAPI('holger', data_dict, holger_api_key, holger_secret)
+					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05)
+					connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05)
 				else:
 					#implement short trades
 					print('Short trades yet to be implemented')
