@@ -194,7 +194,7 @@ def connectAPI(account, params, api_key, secret_key):
 			orderQty = round(orderQty, roundTo)
 		else:
 			math.floor(orderQty)
-		if orderQty >= minOrderQty:	
+		if orderQty >= float(minOrderQty):	
 			#checking maximum leverage is above used leverage
 			maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
 			if leverage < float(maxlever):
