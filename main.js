@@ -1,5 +1,6 @@
 const { RestClientV5 } = require('bybit-api');
 const { Client, Message } = require('discord.js-selfbot-v13')
+const { fs } = require("fs")
 require('dotenv').config()
 let token = process.env.DISC_AUTH;
 const discordClient = new Client({
@@ -215,7 +216,11 @@ discordClient.on('messageCreate', async (message) => {
     if (status) {
         console.log("Pass");
         let details = formatSignal(message);
-        processSignal(details, robKey, robSecret);
+        //write to lastmessage
+        fs.writeFile('last_message.txt', JSON.stringify(details), (err) => {
+            console.log("Error: ", err)
+        })
+        //processSignal(details, robKey, robSecret);
         //processSignal(details, holgerKey, holgerSecret)
     }
 });

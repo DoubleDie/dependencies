@@ -54,33 +54,24 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 	counter = 0
 	while True:
 		try:
-			time.sleep(0.5)
+			time.sleep(0.2)
 			counter += 1
 			datastream = open("last_message.txt", 'r', encoding='utf8')
 			chatlog = datastream.read()
 			datastream.close()
 			if chatlog != content:
 				content = chatlog
-				#returns true or false if a signal is detected
-				if filterMessages(chatlog):
-					#format the data into dict
-					data_dict = formatData(chatlog)
-					stoploss = float(removeComma(data_dict['Stop Loss']))
-					buyprice = float(removeComma(data_dict['Buy Price']))
-					#briefly check if signal is long or short
-					if stoploss < buyprice:
-						#ensure risk/reward ratio is acceptable
-						if float(data_dict['Risk/Reward']) >= 2:
-							#call on api to place trades
-							connectAPI('rob', data_dict, rob_api_key, rob_secret)
-							connectAPI('holger', data_dict, holger_api_key, holger_secret)
-					else:
-						print('Short trades yet to be implemented')
+				data_dict = chatlog
+				print(data_dict)
+				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
+					connectAPI('rob', data_dict, rob_api_key, rob_secret)
+					connectAPI('holger', data_dict, holger_api_key, holger_secret)
+				else:
+					#implement short trades
+					print('Short trades yet to be implemented')
 					print('------------------------------------------------------------------')
 		except:
 			print(traceback.format_exc())
-			message = traceback.format_exc()
-			sendNotif(message)
 			quit()
 
 def filterMessages(message): #determine whether a new message is a valid signal
