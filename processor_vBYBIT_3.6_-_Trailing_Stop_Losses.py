@@ -64,7 +64,7 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 				data_dict = json.loads(chatlog)
 				print(data_dict)
 				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
-					connectAPI('rob', data_dict, rob_api_key, rob_secret)
+					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.1)
 					#connectAPI('holger', data_dict, holger_api_key, holger_secret)
 				else:
 					#implement short trades
@@ -137,7 +137,7 @@ def formatData(message):
 		details_dict['Risk/Reward'] = ''.join(message[16].split(')'))
 	return details_dict
 
-def connectAPI(account, params, api_key, secret_key):
+def connectAPI(account, params, api_key, secret_key, risk):
 	#connect to api
 	bybitAPI = HTTP(
 		testnet = False,
@@ -177,7 +177,7 @@ def connectAPI(account, params, api_key, secret_key):
 			params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
 
 		#calculate risk
-		fiatQuantity = ((0.10 * float(totalBalance))/(abs(float(params["stopLoss"])) - float(params["buyPrice"])))*float(params["buyPrice"])
+		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
 		print(f"purchase amount: {fiatQuantity}")
 
 		#calculating required leverage
