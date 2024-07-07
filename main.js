@@ -217,7 +217,7 @@ discordClient.on('messageCreate', async (message) => {
         console.log("Pass");
         let details = formatSignal(message);
         //write to lastmessage
-        fs.writeFile('last_message.txt', JSON.stringify(details), (err) => {
+        fs.writeFile('last_message.txt', "rah", (err) => {
             console.log("Error: ", err)
         })
         //processSignal(details, robKey, robSecret);
