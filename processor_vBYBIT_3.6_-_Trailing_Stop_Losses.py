@@ -157,13 +157,13 @@ def connectAPI(account, params, api_key, secret_key):
 		totalBalance = float(available) + float(in_positions)
 
 		#get coin price
-		ticker = bybitAPI.get_tickers(category='linear', symbol=coin)
+		ticker = bybitAPI.get_tickers(category='linear', symbol=params["Coin"])
 		currentPrice = float(ticker['result']['list'][0]['lastPrice'])
 		
 
 		#get price diff
 		price_diff = abs(float(params["buyPrice"]) - currentPrice)
-		if price > float(params["buyPrice"]):
+		if currentPrice > float(params["buyPrice"]):
 			params["stopLoss"] = str(float(params["stopLoss"]) + price_diff)
 			params["takeProfit1"] = str(float(params["takeProfit1"]) + price_diff)
 			if params["takeProfit2"] != "":
@@ -210,7 +210,7 @@ def connectAPI(account, params, api_key, secret_key):
 					bybitAPI.set_leverage(category='linear', symbol=params["Coin"], buyLeverage=str(leverage), sellLeverage=str(leverage))
 				except:
 					x = 1
-				trailing = str(round(abs(float(params["buyPrice"]) - float(take_profit)), roundTo))
+				trailing = str(round(abs(float(params["buyPrice"]) - float(params["takeProfit1"])), roundTo))
 				
 				#placing trade
 				init_order = bybitAPI.place_order(
