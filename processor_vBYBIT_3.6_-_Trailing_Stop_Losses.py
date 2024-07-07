@@ -229,6 +229,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				orderId = init_order["result"]["orderId"]
 				print(init_order)
 				new_position = "0"
+				timer = 0
 				while new_position == "0" and timer < 60:
 					time.sleep(0.5)
 					new_position = len(bybitAPI.get_positions(category='linear', symbol=params["Coin"])['result']['list'][0]["avgPrice"])
@@ -236,50 +237,50 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				if timer >= 60:
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol=params["Coin"], orderId=orderId)
-
-				if params["takeProfit2"] != "":
-					first_stop_order = bybitAPI.set_trading_stop(
-						category='linear',
-						symbol=params["Coin"],
-						takeProfit=params["takeProfit1"],
-						stopLoss=params["stopLoss"],
-						tpslMode='Partial',
-						tpOrderType='Market',
-						slOrderType='Market',
-						slSize=str(float(orderQty)/2),
-						tpSize=str(float(orderQty)/2),
-						positionIdx=0
-						)
-
-					second_stop_order = bybitAPI.set_trading_stop(
-						category='linear',
-						symbol=params["Coin"],
-						takeProfit=params["takeProfit2"],
-						stopLoss=params["stopLoss"],
-						tpslMode='Partial',
-						tpOrderType='Market',
-						slOrderType='Market',
-						slSize=str(float(orderQty)/2),
-						tpSize=str(float(orderQty)/2),
-						trailingStop=trailing,
-						activePrice=params["takeProfit1"],
-						positionIdx=0
-						)
 				else:
-					stop_order = bybitAPI.set_trading_stop(
-						category='linear',
-						symbol=params["Coin"],
-						takeProfit=params["takeProfit1"],
-						stopLoss=params["stopLoss"],
-						tpslMode='Partial',
-						tpOrderType='Market',
-						slOrderType='Market',
-						slSize=str(orderQty),
-						tpSize=str(orderQty),
-						positionIdx=0
-						)
+					if params["takeProfit2"] != "":
+						first_stop_order = bybitAPI.set_trading_stop(
+							category='linear',
+							symbol=params["Coin"],
+							takeProfit=params["takeProfit1"],
+							stopLoss=params["stopLoss"],
+							tpslMode='Partial',
+							tpOrderType='Market',
+							slOrderType='Market',
+							slSize=str(float(orderQty)/2),
+							tpSize=str(float(orderQty)/2),
+							positionIdx=0
+							)
 
-				orderTable(params["Coin"], params["buyPrice"], fiatQuantity, leverage, params["stopLoss"], params["takeProfit1"])
+						second_stop_order = bybitAPI.set_trading_stop(
+							category='linear',
+							symbol=params["Coin"],
+							takeProfit=params["takeProfit2"],
+							stopLoss=params["stopLoss"],
+							tpslMode='Partial',
+							tpOrderType='Market',
+							slOrderType='Market',
+							slSize=str(float(orderQty)/2),
+							tpSize=str(float(orderQty)/2),
+							trailingStop=trailing,
+							activePrice=params["takeProfit1"],
+							positionIdx=0
+							)
+					else:
+						stop_order = bybitAPI.set_trading_stop(
+							category='linear',
+							symbol=params["Coin"],
+							takeProfit=params["takeProfit1"],
+							stopLoss=params["stopLoss"],
+							tpslMode='Partial',
+							tpOrderType='Market',
+							slOrderType='Market',
+							slSize=str(orderQty),
+							tpSize=str(orderQty),
+							positionIdx=0
+							)
+
+					orderTable(params["Coin"], params["buyPrice"], fiatQuantity, leverage, params["stopLoss"], params["takeProfit1"])
 
 def removeComma(number):
 	number = number.split(',')
