@@ -194,7 +194,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 			roundTo = len(str(minOrderQty).split(".")[1])
 			orderQty = round(orderQty, roundTo)
 		else:
-			math.floor(orderQty)
+			orderQty = math.floor(orderQty)
 		print(f"min: {minOrderQty}")
 		print(f"actual: {orderQty}")
 		if orderQty >= float(minOrderQty):	
