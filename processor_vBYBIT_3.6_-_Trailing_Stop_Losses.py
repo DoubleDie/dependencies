@@ -145,7 +145,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 		api_secret = secret_key)
 
 	abandon = False
-	print("initiating")
+	print("Initiating trade process...")
 	#check for positions
 	positions = len(bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list'])
 	 
@@ -178,7 +178,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 
 		#calculate risk
 		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
-		print(f"purchase amount: {fiatQuantity}")
+		print(f"Purchase amount: {fiatQuantity}")
 
 		#calculating required leverage
 		if positions == 0:
@@ -195,16 +195,14 @@ def connectAPI(account, params, api_key, secret_key, risk):
 			orderQty = round(orderQty, roundTo)
 		else:
 			orderQty = math.floor(orderQty)
-		print(f"min: {minOrderQty}")
-		print(f"actual: {orderQty}")
 		if orderQty >= float(minOrderQty):	
-			print("min quant good")
+			print("Minimum order quantity: pass")
 			#checking maximum leverage is above used leverage
 			maxlever = inst_info['result']['list'][0]['leverageFilter']['maxLeverage']
 			if leverage < float(maxlever):
-				print("lever good")
+				print("Leverage: pass")
 				#rounding all price figures to the instruments native figures
-				if '.' in params["buyPrice"]:
+				if '.' in str(params["buyPrice"]):
 					roundTo = len(params["buyPrice"].split('.')[1])
 					
 				else:
