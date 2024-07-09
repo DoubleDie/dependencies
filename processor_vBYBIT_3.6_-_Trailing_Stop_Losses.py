@@ -64,12 +64,12 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 				data_dict = json.loads(chatlog)
 				print(data_dict)
 				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
-					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05)
-					connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05)
+					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05, "Buy")
+					#connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Buy")
 				else:
-					#implement short trades
-					print('Short trades yet to be implemented')
-					print('------------------------------------------------------------------')
+					print("short trades still in the works")
+					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05, "Sell")
+					#connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Sell")
 		except:
 			print(traceback.format_exc())
 			quit()
@@ -137,7 +137,7 @@ def formatData(message):
 		details_dict['Risk/Reward'] = ''.join(message[16].split(')'))
 	return details_dict
 
-def connectAPI(account, params, api_key, secret_key, risk):
+def connectAPI(account, params, api_key, secret_key, risk, direction):
 	#connect to api
 	bybitAPI = HTTP(
 		testnet = False,
@@ -168,13 +168,13 @@ def connectAPI(account, params, api_key, secret_key, risk):
 			params["takeProfit1"] = str(float(params["takeProfit1"]) + price_diff)
 			if params["takeProfit2"] != "":
 				params["takeProfit2"] = str(float(params["takeProfit2"]) + price_diff)
-			#params["buyPrice"] = str(float(params["buyPrice"]) + price_diff)
+			params["buyPrice"] = str(float(params["buyPrice"]) + price_diff)
 		else:
 			params["stopLoss"] = str(float(params["stopLoss"]) - price_diff)
 			params["takeProfit1"] = str(float(params["takeProfit1"]) - price_diff)
 			if params["takeProfit2"] != "":
 				params["takeProfit2"] = str(float(params["takeProfit2"]) - price_diff)
-			#params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
+			params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
 
 		#calculate risk
 		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
@@ -219,7 +219,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				init_order = bybitAPI.place_order(
 					category='linear',
 					symbol=params["Coin"],
-					side='Buy',
+					side=direction,
 					orderType='Limit',
 					qty=str(orderQty),
 					price=params["buyPrice"]
@@ -231,9 +231,9 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				while new_position == "0" and timer < 60:
 					time.sleep(0.5)
 					new_position = bybitAPI.get_positions(category='linear', symbol=params["Coin"])['result']['list'][0]["avgPrice"]
-					print(f"Position average price: ${new_position}")
 					timer += 1
-					print(f"Trying for ${timer} more seconds.")
+					if timer == 30:
+						print(f"Trying for {timer} more seconds.")
 				if timer >= 60:
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol=params["Coin"], orderId=orderId)
