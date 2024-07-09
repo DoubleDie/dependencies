@@ -203,7 +203,7 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				print("Leverage: pass")
 				#rounding all price figures to the instruments native figures
 				if '.' in str(params["buyPrice"]):
-					roundTo = len(params["buyPrice"].split('.')[1])
+					roundTo = len(str(params["buyPrice"]).split('.')[1])
 					
 				else:
 					roundTo = 0
