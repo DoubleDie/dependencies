@@ -168,13 +168,13 @@ def connectAPI(account, params, api_key, secret_key, risk):
 			params["takeProfit1"] = str(float(params["takeProfit1"]) + price_diff)
 			if params["takeProfit2"] != "":
 				params["takeProfit2"] = str(float(params["takeProfit2"]) + price_diff)
-			params["buyPrice"] = str(float(params["buyPrice"]) + price_diff)
+			#params["buyPrice"] = str(float(params["buyPrice"]) + price_diff)
 		else:
 			params["stopLoss"] = str(float(params["stopLoss"]) - price_diff)
 			params["takeProfit1"] = str(float(params["takeProfit1"]) - price_diff)
 			if params["takeProfit2"] != "":
 				params["takeProfit2"] = str(float(params["takeProfit2"]) - price_diff)
-			params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
+			#params["buyPrice"] = str(float(params["buyPrice"]) - price_diff)
 
 		#calculate risk
 		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
@@ -232,8 +232,10 @@ def connectAPI(account, params, api_key, secret_key, risk):
 				timer = 0
 				while new_position == "0" and timer < 60:
 					time.sleep(0.5)
-					new_position = len(bybitAPI.get_positions(category='linear', symbol=params["Coin"])['result']['list'][0]["avgPrice"])
+					new_position = bybitAPI.get_positions(category='linear', symbol=params["Coin"])['result']['list'][0]["avgPrice"]
+					print(f"Position average price: ${new_position}")
 					timer += 1
+					print(f"Trying for ${timer} more seconds.")
 				if timer >= 60:
 					print("Trade aborted: Position not filled in time.")
 					bybitAPI.cancel_order(category="linear", symbol=params["Coin"], orderId=orderId)
