@@ -149,7 +149,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 	#check for positions
 	positions = len(bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list'])
 	 
-	if positions <= 2:
+	if positions <= 1:
 	#get account balance
 		balance = bybitAPI.get_wallet_balance(accountType='UNIFIED', coin='USDT')
 		available = balance['result']['list'][0]['coin'][0]['availableToWithdraw']
@@ -181,6 +181,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		print(f"Purchase amount: {fiatQuantity}")
 
 		#calculating required leverage
+		print(positions)
 		if positions == 0:
 			leverage = math.ceil((fiatQuantity)/(float(available)/2))
 		if positions == 1:
