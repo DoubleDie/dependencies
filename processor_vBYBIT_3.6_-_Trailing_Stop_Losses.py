@@ -180,12 +180,14 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 		fiatQuantity = ((risk * float(totalBalance)) / (abs(float(params["stopLoss"]) - float(params["buyPrice"])))) * float(params["buyPrice"])
 		print(f"Purchase amount: {fiatQuantity}")
 
+		buffer = fiatQuantity * 0.02
+
 		#calculating required leverage
 		print(positions)
 		if positions == 0:
-			leverage = math.ceil((fiatQuantity)/(float(available)/2))
+			leverage = math.ceil((fiatQuantity + buffer)/(float(available)/2))
 		if positions == 1:
-			leverage = math.ceil((fiatQuantity)/float(available))
+			leverage = math.ceil((fiatQuantity + buffer)/float(available))
 
 		#calculating qantity
 		inst_info = bybitAPI.get_instruments_info(category='linear', symbol=params["Coin"])
