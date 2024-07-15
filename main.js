@@ -11,7 +11,7 @@ discordClient.on('ready', async () => {
 	console.log('Client is ready...')
 });
 
-const commonTerms = ["Target 1:", "POWER", "SL Close Below", "<@&1180193532309409874>"];
+const commonTerms = ["Target 1:", "POWER", "SL Close", "<@&1180193532309409874>"];
 const tradingPairs = ["ETC | USDT", "AVAX | USDT", "ATOM | USDT", "LINK | USDT", "XRP | USDT", "EOS | USDT", "AAVE | USDT", "XTZ | USDT", "ETH | USDT", "SAND | USDT", "BTC | USDT", "NEAR | USDT", "QTUM | USDT", "BAT | USDT", "DOT | USDT", "LTC | USDT", "BNB | USDT", "XLM | USDT", "MATIC | USDT", "FIL | USDT", "UNI | USDT", "SOL | USDT", "FTM | USDT"];
 robKey = process.env.ROB_KEY;
 robSecret = process.env.ROB_SECRET;
