@@ -150,6 +150,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 	positions = len(bybitAPI.get_positions(category='linear', settleCoin='USDT')['result']['list'])
 	 
 	if positions <= 1:
+		print("positions ok")
 	#get account balance
 		balance = bybitAPI.get_wallet_balance(accountType='UNIFIED', coin='USDT')
 		available = balance['result']['list'][0]['coin'][0]['availableToWithdraw']
@@ -284,7 +285,8 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 							)
 
 					orderTable(params["Coin"], params["buyPrice"], fiatQuantity, leverage, params["stopLoss"], params["takeProfit1"])
-
+	else:
+		print("Too many positions open.")
 def removeComma(number):
 	number = number.split(',')
 	return ''.join(number)
