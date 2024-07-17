@@ -247,11 +247,8 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 							category='linear',
 							symbol=params["Coin"],
 							takeProfit=params["takeProfit1"],
-							stopLoss=params["stopLoss"],
 							tpslMode='Partial',
 							tpOrderType='Market',
-							slOrderType='Market',
-							slSize=str(float(orderQty)/2),
 							tpSize=str(float(orderQty)/2),
 							positionIdx=0
 							)
@@ -261,11 +258,9 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 							symbol=params["Coin"],
 							takeProfit=params["takeProfit2"],
 							stopLoss=params["stopLoss"],
-							tpslMode='Partial',
+							tpslMode='Full',
 							tpOrderType='Market',
 							slOrderType='Market',
-							slSize=str(float(orderQty)/2),
-							tpSize=str(float(orderQty)/2),
 							trailingStop=trailing,
 							activePrice=params["takeProfit1"],
 							positionIdx=0
@@ -276,11 +271,9 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 							symbol=params["Coin"],
 							takeProfit=params["takeProfit1"],
 							stopLoss=params["stopLoss"],
-							tpslMode='Partial',
+							tpslMode='Full',
 							tpOrderType='Market',
 							slOrderType='Market',
-							slSize=str(orderQty),
-							tpSize=str(orderQty),
 							positionIdx=0
 							)
 
