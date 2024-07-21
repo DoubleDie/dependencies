@@ -243,17 +243,7 @@ def connectAPI(account, params, api_key, secret_key, risk, direction):
 					bybitAPI.cancel_order(category="linear", symbol=params["Coin"], orderId=orderId)
 				else:
 					if params["takeProfit2"] != "":
-						first_stop_order = bybitAPI.set_trading_stop(
-							category='linear',
-							symbol=params["Coin"],
-							takeProfit=params["takeProfit1"],
-							tpslMode='Partial',
-							tpOrderType='Market',
-							tpSize=str(float(orderQty)/2),
-							positionIdx=0
-							)
-
-						second_stop_order = bybitAPI.set_trading_stop(
+						stop_order = bybitAPI.set_trading_stop(
 							category='linear',
 							symbol=params["Coin"],
 							takeProfit=params["takeProfit2"],
