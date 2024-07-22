@@ -65,11 +65,11 @@ def messageUpdate(content): #update latest message and ensure it is a new messag
 				print(data_dict)
 				if float(data_dict['stopLoss']) < float(data_dict['takeProfit1']):
 					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05, "Buy")
-					#connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Buy")
+					connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Buy")
 				else:
 					print("short trades still in the works")
 					connectAPI('rob', data_dict, rob_api_key, rob_secret, 0.05, "Sell")
-					#connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Sell")
+					connectAPI('holger', data_dict, holger_api_key, holger_secret, 0.05, "Sell")
 		except:
 			print(traceback.format_exc())
 			quit()
